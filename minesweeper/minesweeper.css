@@ -1,0 +1,36 @@
+div#mine {
+	margin-left: auto;
+	margin-right: auto;
+	width: 400px;
+	height: 400px;
+	background-color: #EEE;
+}
+
+div#stats {
+	margin-left: auto;
+	margin-right: auto;
+	width: 400px;
+	height: 100px;
+	background-color:#EEE;
+}
+div.pic { 
+	width: 40px;
+	height: 40px; 
+	background-image:url('images/ms.png');
+	display: inline-block;
+	float: left; 
+}
+div.zero { background-position: 0px 0px; }
+div.one { background-position: -40px 0px; }
+div.two { background-position: -80px 0px; }
+div.three { background-position: -120px 0px; }
+div.four { background-position: -160px 0px; }
+div.five { background-position: -200px 0px; }
+div.six { background-position: -240px 0px; }
+div.seven { background-position: 0px -40px; }
+div.eight { background-position: -40px -40px; }
+div.x { background-position: -80px -40px; }
+div.f { background-position: -120px -40px; }
+div.q { background-position: -160px -40px; }
+div.m { background-position: -200px -40px; }
+div.e { background-position: -240px -40px; }
