@@ -5,19 +5,33 @@ var minesweeper = function () {
 		gameState = 'start', // 游戏状态
 		remains = [],
 		remainsNotMines = rows * columns - mines,
-		init = function () { // 初始化雷区
-			for (var i = 0; i < rows * columns; ++i) {
-				remains[i] = i;
-				var div = document.createElement('div');
-				div.className = 'pic e';
-				div.id = '' + i;
-				div.addEventListener('click', click)
-				mineArea.appendChild(div);
+		// 初始化雷区，notPlaceMineIndex为第一下点到了雷则重新排布雷区
+		init = function (notPlaceMineIndex) { 
+			if (notPlaceMineIndex == undefined) {
+				for (var i = 0; i < rows * columns; ++i) {
+					remains[i] = i;
+					var div = document.createElement('div');
+					div.className = 'pic e';
+					div.id = '' + i;
+					div.addEventListener('click', click),
+					div.addEventListener('contextmenu', function(e) {
+						e.preventDefault();
+						click(e);
+					}),
+					mineArea.appendChild(div);
+				}
 			}
+			
 			// 随机放置十枚雷
 			var mines = [];
 				
 			for (var prepare = Math.floor(Math.random() * 100); mines.length < 10; prepare = Math.floor(Math.random() * 100)) {
+				// 再生成则跳过点击的点
+				if (notPlaceMineIndex != undefined) {
+					if (prepare == notPlaceMineIndex) {
+						continue;
+					}
+				}
 				if (mines.indexOf(prepare) == -1) {
 					mines.push(prepare);
 				}
@@ -36,20 +50,37 @@ var minesweeper = function () {
 		},
 		// 随便点一个
 		click = function (event) {
-			if (gameState != 'start') {
+			if (!(gameState == 'start' || gameState == 'sweeping')) {
 				return;
 			}
 			var y = Math.floor(event.target.id / 10),
 				x = event.target.id - y * 10;
-			console.log('click: x->' + x + ' y->' + y);
-			if (remains[event.target.id] == 1) {
-				boom(event.target.id);
-			} else {
-				around(x, y);
-			}
-			console.log('还剩' + remainsNotMines + '块');
-			if (remainsNotMines == 0) {
-				win();
+			// 左键
+			if (event.button == 0) {
+				// 第一下点到雷需要重排雷并点开这个点
+				if (gameState == 'start' ) {
+					if (remains[event.target.id] == 1) {
+						console.log('recreate the mines area...');
+						init(event.target.id);
+						around(x, y);
+					}
+					gameState = 'sweeping';
+					console.log('change to "sweeping"...');
+				} 
+				
+				console.log('click: x->' + x + ' y->' + y);
+				if (remains[event.target.id] == 1) {
+					boom(event.target.id);
+				} else {
+					around(x, y);
+				}
+				console.log('还剩' + remainsNotMines + '块');
+				if (remainsNotMines == 0) {
+					win();
+				}
+			// 右键
+			} else if (event.button == 2) {
+				console.log('x:' + x + ' y:' + y);
 			}
 		},
 		// 检查周围八个格子
