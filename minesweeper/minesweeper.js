@@ -2,14 +2,17 @@ var minesweeper = function () {
 	var mineArea = document.getElementById('mine'),
 		statsArea = document.getElementById('stats'),
 		mines = 10, rows = 10, columns = 10, sideLen = 40,
-		gameState = 'start', // 游戏状态
+		NOTMINE = 0, ISMINE = 1, // 分别是不是雷，是雷
+		NOTPLACED = 0, FLAGED = 1, NOTCONFIRM = 2, NUMBERED = 3, // 未标记，标记是雷（旗子，可能不是），不确定是不是雷（以？表示）, 已经被点出来(数字)
+		gameState = 'start', // 游戏状态，有start，sweeping，win和boom四个状态
 		remains = [],
+		userStatus = [],
 		remainsNotMines = rows * columns - mines,
 		// 初始化雷区，notPlaceMineIndex为第一下点到了雷则重新排布雷区
 		init = function (notPlaceMineIndex) { 
+			// 初次运行则增加10x10的格子作为点的区域
 			if (notPlaceMineIndex == undefined) {
 				for (var i = 0; i < rows * columns; ++i) {
-					remains[i] = i;
 					var div = document.createElement('div');
 					div.className = 'pic e';
 					div.id = '' + i;
@@ -20,6 +23,11 @@ var minesweeper = function () {
 					}),
 					mineArea.appendChild(div);
 				}
+			}
+			
+			// 初始化用户点选状态
+			for (var i = 0; i < rows * columns; ++i) {
+				userStatus[i] = NOTPLACED;				
 			}
 			
 			// 随机放置十枚雷
@@ -39,9 +47,9 @@ var minesweeper = function () {
 			// mines = mines.sort()
 			for (var i = 0; i < rows * columns; ++i) {
 				if (mines.indexOf(i) == -1) {
-					remains[i] = 0;
+					remains[i] = NOTMINE;
 				} else {
-					remains[i] = 1;
+					remains[i] = ISMINE;
 				}
 			}
 			// console.log(remains);
@@ -68,7 +76,7 @@ var minesweeper = function () {
 					console.log('change to "sweeping"...');
 				} 
 				
-				console.log('click: x->' + x + ' y->' + y);
+				console.log('Left click: x->' + x + ' y->' + y);
 				if (remains[event.target.id] == 1) {
 					boom(event.target.id);
 				} else {
@@ -80,7 +88,24 @@ var minesweeper = function () {
 				}
 			// 右键
 			} else if (event.button == 2) {
-				console.log('x:' + x + ' y:' + y);
+				console.log('Right click: x->' + x + ' y->' + y);
+				
+				var boxStatus = userStatus[event.target.id];
+				// 若是已经点出来的就不作任何操作
+				if (boxStatus == NUMBERED) {
+					return;
+				}
+				
+				if (boxStatus == NOTPLACED) {
+					userStatus[event.target.id] = FLAGED;
+					document.getElementById('' + event.target.id).className = 'pic f';
+				} else if (boxStatus == FLAGED) {
+					userStatus[event.target.id] = NOTCONFIRM;
+					document.getElementById('' + event.target.id).className = 'pic m';
+				} else {
+					userStatus[event.target.id] = NOTPLACED;
+					document.getElementById('' + event.target.id).className = 'pic e';
+				}
 			}
 		},
 		// 检查周围八个格子
@@ -92,7 +117,7 @@ var minesweeper = function () {
 				return;
 			}
 			
-			if (remains[x + y * rows] == 2) {
+			if (userStatus[x + y * rows] == NUMBERED) {
 				return;
 			}
 			var aroundMinesNum = 0,
@@ -107,7 +132,7 @@ var minesweeper = function () {
 						aroundMinesNum += 1;
 					}
 				};
-			remains[x + y * rows] = 2;
+			userStatus[x + y * rows] = NUMBERED;
 			
 			check(x - 1, y - 1);
 			check(x - 1, y);
@@ -133,6 +158,7 @@ var minesweeper = function () {
 				remainsNotMines -= 1;
 			} else {
 				// console.log("x:" + x + " y:" + y + ' aroundMinesNum:' + aroundMinesNum);
+				// 有则根据aroundMinesNum绘制数字
 				if (aroundMinesNum == 1) {
 					document.getElementById('' + (x + rows * y)).className = 'pic one';
 				} else if (aroundMinesNum == 2) {
@@ -175,6 +201,16 @@ var minesweeper = function () {
 			}
 			statsArea.innerHTML = 'win';
 		},
+		// 打印用户点击信息 
+		printUserStatus = function (line, perline) {
+			var output = '';
+			for (var i = 0; i < line; ++i) {
+				output += userStatus.slice(rows * i, rows * i + perline) + "\n";
+			}
+			console.log(output);
+		},
+		
+		// 打印某个作弊（！）信息
 		printMines = function (line, perline) {
 			var output = '';
 			for (var i = 0; i < line; ++i) {
