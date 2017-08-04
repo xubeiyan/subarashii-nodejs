@@ -10,6 +10,7 @@ var minesweeper = function () {
 		remainsNotMines = rows * columns - mines,
 		// 初始化雷区，notPlaceMineIndex为第一下点到了雷则重新排布雷区
 		init = function (notPlaceMineIndex) { 
+			console.log('change to "start"...');
 			// 初次运行则增加10x10的格子作为点的区域
 			if (notPlaceMineIndex == undefined) {
 				for (var i = 0; i < rows * columns; ++i) {
@@ -54,6 +55,7 @@ var minesweeper = function () {
 			}
 			// console.log(remains);
 			printMines(10, 10);
+			
 			gameState = 'start';
 		},
 		// 随便点一个
@@ -181,6 +183,7 @@ var minesweeper = function () {
 		}
 		// 点到了雷
 		boom = function (id) {
+			console.log('change to "boom"...');
 			gameState = 'boom';
 			statsArea.innerHTML = 'boom';
 			for (var i = 0; i < rows * columns; ++i) {
@@ -193,6 +196,7 @@ var minesweeper = function () {
 		
 		// 胜利
 		win = function () {
+			console.log('change to "win"...');
 			gameState = 'win';
 			for (var i = 0; i < rows * columns; ++i) {
 				if (remains[i] == 1) {
