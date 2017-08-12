@@ -1,17 +1,41 @@
 var minesweeper = function () {
 	var mineArea = document.getElementById('mine'),
 		statsArea = document.getElementById('stats'),
-		mines = 10, rows = 10, columns = 10, sideLen = 40,
+		diffString = window.location.search,
+		difficulty = ['10|9|9', '40|16|16', '99|30|16'], // 难度
+		rows, columns, mineNum, sideLen = 40,
 		NOTMINE = 0, ISMINE = 1, // 分别是不是雷，是雷
 		NOTPLACED = 0, FLAGED = 1, NOTCONFIRM = 2, NUMBERED = 3, // 未标记，标记是雷（旗子，可能不是），不确定是不是雷（以？表示）, 已经被点出来(数字)
 		gameState = 'start', // 游戏状态，有start，sweeping，win和boom四个状态
 		remains = [],
 		userStatus = [],
-		remainsNotMines = rows * columns - mines,
+		remainsNotMines,  // 剩余的不是雷的方块
 		// 初始化雷区，notPlaceMineIndex为第一下点到了雷则重新排布雷区
 		init = function (notPlaceMineIndex) { 
-			console.log('change to "start"...');
-			// 初次运行则增加10x10的格子作为点的区域
+			// 根据难度选择生成的格子数
+			if (diffString == '') {
+				diffString = '?easy';
+			}
+			
+			var difficultText;
+			// console.log(diffString);
+			if (diffString == '?easy') {
+				difficultText = difficulty[0];
+			} else if (diffString == '?medium') {
+				difficultText = difficulty[1];
+			} else if (diffString == '?hard') {
+				difficultText = difficulty[2];
+			}
+			mineNum = parseInt(difficultText.split('|')[0]);
+			rows = parseInt(difficultText.split('|')[1]);
+			columns = parseInt(difficultText.split('|')[2]);
+			
+			remainsNotMines = rows * columns - mineNum;
+			
+			console.log('change status to "start"...');
+			console.log('this difficulty is ' + difficultText);
+			
+			// 初次运行则增加rows x columns的格子作为点的区域
 			if (notPlaceMineIndex == undefined) {
 				for (var i = 0; i < rows * columns; ++i) {
 					var div = document.createElement('div');
@@ -34,7 +58,7 @@ var minesweeper = function () {
 			// 随机放置十枚雷
 			var mines = [];
 				
-			for (var prepare = Math.floor(Math.random() * 100); mines.length < 10; prepare = Math.floor(Math.random() * 100)) {
+			for (var prepare = Math.floor(Math.random() * rows * columns); mines.length < mineNum; prepare = Math.floor(Math.random() * rows * columns)) {
 				// 再生成则跳过点击的点
 				if (notPlaceMineIndex != undefined) {
 					if (prepare == notPlaceMineIndex) {
@@ -45,7 +69,7 @@ var minesweeper = function () {
 					mines.push(prepare);
 				}
 			};
-			// mines = mines.sort()
+			// console.log(mines.sort(function (a, b) {return a - b;}));
 			for (var i = 0; i < rows * columns; ++i) {
 				if (mines.indexOf(i) == -1) {
 					remains[i] = NOTMINE;
@@ -54,8 +78,11 @@ var minesweeper = function () {
 				}
 			}
 			// console.log(remains);
-			printMines(10, 10);
-			
+			printMines();
+			// console.log(remains);
+			// 修改div的宽度与高度
+			mineArea.style.width = rows * sideLen + 'px';
+			mineArea.style.height = columns * sideLen + 'px';
 			gameState = 'start';
 		},
 		// 随便点一个
@@ -63,8 +90,8 @@ var minesweeper = function () {
 			if (!(gameState == 'start' || gameState == 'sweeping')) {
 				return;
 			}
-			var y = Math.floor(event.target.id / 10),
-				x = event.target.id - y * 10;
+			var y = Math.floor(event.target.id / rows),
+				x = event.target.id - y * rows;
 			// 左键
 			if (event.button == 0) {
 				// 第一下点到雷需要重排雷并点开这个点
@@ -75,8 +102,9 @@ var minesweeper = function () {
 						around(x, y);
 					}
 					gameState = 'sweeping';
-					console.log('change to "sweeping"...');
+					console.log('change status to "sweeping"...');
 				} 
+				statsArea.innerHTML = '还剩' + remainsNotMines + '块';
 				
 				console.log('Left click: x->' + x + ' y->' + y);
 				if (remains[event.target.id] == 1) {
@@ -84,7 +112,6 @@ var minesweeper = function () {
 				} else {
 					around(x, y);
 				}
-				console.log('还剩' + remainsNotMines + '块');
 				if (remainsNotMines == 0) {
 					win();
 				}
@@ -112,10 +139,10 @@ var minesweeper = function () {
 		},
 		// 检查周围八个格子
 		around = function (x, y) {
-			if (x < 0 || x > 9) {
+			if (x < 0 || x > rows - 1) {
 				return;
 			}
-			if (y < 0 || y > 9) {
+			if (y < 0 || y > columns - 1) {
 				return;
 			}
 			
@@ -124,10 +151,10 @@ var minesweeper = function () {
 			}
 			var aroundMinesNum = 0,
 				check = function (xPos, yPos) {
-					if (xPos < 0 || xPos > 9) {
+					if (xPos < 0 || xPos > rows - 1) {
 						return;
 					}
-					if (yPos < 0 || yPos > 9) {
+					if (yPos < 0 || yPos > columns - 1) {
 						return;
 					}
 					if (remains[yPos * rows + xPos] == 1) {
@@ -180,10 +207,10 @@ var minesweeper = function () {
 				}
 				remainsNotMines -= 1;
 			}
-		}
+		},
 		// 点到了雷
 		boom = function (id) {
-			console.log('change to "boom"...');
+			console.log('change status to "boom"...');
 			gameState = 'boom';
 			statsArea.innerHTML = 'boom';
 			for (var i = 0; i < rows * columns; ++i) {
@@ -196,7 +223,7 @@ var minesweeper = function () {
 		
 		// 胜利
 		win = function () {
-			console.log('change to "win"...');
+			console.log('change status to "win"...');
 			gameState = 'win';
 			for (var i = 0; i < rows * columns; ++i) {
 				if (remains[i] == 1) {
@@ -206,19 +233,25 @@ var minesweeper = function () {
 			statsArea.innerHTML = 'win';
 		},
 		// 打印用户点击信息 
-		printUserStatus = function (line, perline) {
+		printUserStatus = function () {
 			var output = '';
 			for (var i = 0; i < line; ++i) {
-				output += userStatus.slice(rows * i, rows * i + perline) + "\n";
+				output += userStatus.slice(columns * i, columns * i + 30) + "\n";
 			}
 			console.log(output);
 		},
 		
 		// 打印某个作弊（！）信息
-		printMines = function (line, perline) {
-			var output = '';
-			for (var i = 0; i < line; ++i) {
-				output += remains.slice(rows * i, rows * i + perline) + "\n";
+		printMines = function () {
+			var output = '',
+				perline = rows;
+			
+			for (var i = 0; i < columns; ++i) {
+				var start = rows * i,
+					end = start + rows;
+					
+				// console.log('start: ' + start + ' end:' + end);
+				output += remains.slice(start, end) + "\n";
 			}
 			console.log(output);
 		};
