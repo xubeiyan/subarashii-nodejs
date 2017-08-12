@@ -104,7 +104,7 @@ var minesweeper = function () {
 					gameState = 'sweeping';
 					console.log('change status to "sweeping"...');
 				} 
-				statsArea.innerHTML = '还剩' + remainsNotMines + '块';
+				
 				
 				console.log('Left click: x->' + x + ' y->' + y);
 				if (remains[event.target.id] == 1) {
@@ -112,6 +112,10 @@ var minesweeper = function () {
 				} else {
 					around(x, y);
 				}
+				if (gameState == 'sweeping') {
+					statsArea.innerHTML = '还剩' + remainsNotMines + '块';					
+				}
+				
 				if (remainsNotMines == 0) {
 					win();
 				}
