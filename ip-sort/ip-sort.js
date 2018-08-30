@@ -9,31 +9,15 @@ fs.readFile(input, 'utf-8', (err, data) => {
 	// console.log(ip_arr);
 	
 	let sorted = ip_arr.sort((a, b) => {
-		let a_arr = a.split('.');
-		let b_arr = b.split('.');
+		let a_arr = a.split('.').map(x => Number(x));
+		let b_arr = b.split('.').map(x => Number(x));
 		
-		if (Number(a_arr[0]) > Number(b_arr[0])) {
-			return 1;
-		} else if (Number(a_arr[0]) < Number(b_arr[0])) {
-			return -1;
-		}
-		
-		if (Number(a_arr[1]) > Number(b_arr[1])) {
-			return 1;
-		} else if (Number(a_arr[1]) < Number(b_arr[1])) {
-			return -1;
-		}
-		
-		if (Number(a_arr[2]) > Number(b_arr[2])) {
-			return 1;
-		} else if (Number(a_arr[2]) < Number(b_arr[2])) {
-			return -1;
-		}
-		
-		if (Number(a_arr[3]) > Number(b_arr[3])) {
-			return 1;
-		} else if (Number(a_arr[3]) < Number(b_arr[3])) {
-			return -1;
+		for (let i = 0; i < a_arr.length; ++i) {
+			if (a_arr[i] > b_arr[i]) {
+				return 1;
+			} else if (a_arr[i] < b_arr[i]) {
+				return -1;
+			}
 		}
 		
 		return 0;
