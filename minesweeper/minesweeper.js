@@ -258,8 +258,26 @@ var minesweeper = function () {
 				output += remains.slice(start, end) + "\n";
 			}
 			console.log(output);
-		};
+		},
+		restart = document.getElementById('restart'),
+		easy = document.getElementById('easy'),
+		medium = document.getElementById('medium'),
+		hard = document.getElementById('hard');
 		
+	restart.addEventListener('click', function () {
+		window.location.reload();
+	});
+	easy.addEventListener('click', function () {
+		window.location.search = '?easy';
+	});
+	medium.addEventListener('click', function () {
+		window.location.search = '?medium';
+	});
+	hard.addEventListener('click', function () {
+		window.location.search = '?hard';
+	});
+	
 	init();
 	// mineArea.addEventListener('click', click);
 };
+	
