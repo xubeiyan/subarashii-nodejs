@@ -1,0 +1,69 @@
+### make a new room
+POST http://localhost:3000/room/initiate
+Content-Type: application/json
+Authorization: jwt eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJmMTU0YjVhMmNhYzg0ODJhYjc2YjMwNjVhZTk5ZjNlNyIsInVzZXJUeXBlIjoiY29uc3VtZXIiLCJpYXQiOjE2NDEwOTEzMDJ9.6zIhDnyNvYoUqXC_-oTJbX3UAiTlfhfHY0YiqbsF1dI
+
+{
+  "userIds": ["f154b5a2cac8482ab76b3065ae99f3e7", "a3c8f3536e3d4f458b5e7accea1f55a7"],
+  "type": "consumer-to-consumer"
+}
+### send a message
+POST http://localhost:3000/room/fc1dfac46da946bca66e3ed20ad931cb/message
+Content-Type: application/json
+Authorization: jwt eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJmMTU0YjVhMmNhYzg0ODJhYjc2YjMwNjVhZTk5ZjNlNyIsInVzZXJUeXBlIjoiY29uc3VtZXIiLCJpYXQiOjE2NDEwOTEzMDJ9.6zIhDnyNvYoUqXC_-oTJbX3UAiTlfhfHY0YiqbsF1dI
+
+{
+  "messageText": "Mr. Watson come here I want you."
+}
+
+### send another message
+POST http://localhost:3000/room/fc1dfac46da946bca66e3ed20ad931cb/message
+Content-Type: application/json
+Authorization: jwt eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJhM2M4ZjM1MzZlM2Q0ZjQ1OGI1ZTdhY2NlYTFmNTVhNyIsInVzZXJUeXBlIjoiY29uc3VtZXIiLCJpYXQiOjE2NDExMTYzMTd9._QvbmIkrQVAkxoFB0-Nsn_Y9SwPthMs2kcSVomNMrGI
+
+{
+  "messageText": "Ok, I will come"
+}
+
+### get chatroom conversation message
+GET http://localhost:3000/room/fc1dfac46da946bca66e3ed20ad931cb/
+Authorization: jwt eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJmMTU0YjVhMmNhYzg0ODJhYjc2YjMwNjVhZTk5ZjNlNyIsInVzZXJUeXBlIjoiY29uc3VtZXIiLCJpYXQiOjE2NDEwOTEzMDJ9.6zIhDnyNvYoUqXC_-oTJbX3UAiTlfhfHY0YiqbsF1dI
+
+### mark chatroom message as read
+PUT http://localhost:3000/room/fc1dfac46da946bca66e3ed20ad931cb/mark-read
+Authorization: jwt eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJmMTU0YjVhMmNhYzg0ODJhYjc2YjMwNjVhZTk5ZjNlNyIsInVzZXJUeXBlIjoiY29uc3VtZXIiLCJpYXQiOjE2NDEwOTEzMDJ9.6zIhDnyNvYoUqXC_-oTJbX3UAiTlfhfHY0YiqbsF1dI
+
+###
+GET http://localhost:3000/users
+
+### create a user
+POST http://localhost:3000/users
+Content-Type: application/json
+
+{
+  "firstName": "Alexander",
+  "lastName": "Bell",
+  "type": "consumer"
+}
+
+### create another user
+POST http://localhost:3000/users
+Content-Type: application/json
+
+{
+  "firstName": "Thomas",
+  "lastName": "Watson",
+  "type": "consumer"
+}
+
+### login one
+POST http://localhost:3000/login/f154b5a2cac8482ab76b3065ae99f3e7
+
+### login another
+POST http://localhost:3000/login/a3c8f3536e3d4f458b5e7accea1f55a7
+
+### delete room 
+DELETE http://localhost:3000/delete/room/fc1dfac46da946bca66e3ed20ad931cb
+
+### delete message
+DELETE http://localhost:3000/delete/message/5147ebb81cbc48e2840593bdccf8b3a8
